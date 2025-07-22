@@ -15,8 +15,7 @@ const clientschema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:["active","inactive"],
-        default:"active"
+        required:true
     },
     createdAt:{
         type:Date,
