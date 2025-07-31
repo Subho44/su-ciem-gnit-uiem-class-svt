@@ -2,13 +2,17 @@ import React,{useState,useEffect} from 'react'
 import axios from "axios"
 
 const Clientform = ({fetchclient,selectedclient,setSelectedclient}) => {
-    const [form,setForm] = useState({name:"",sector:"",location:"",status:""});
+    const [form,setForm] = useState({name:"",sector:"",location:"",status:"",image:null});
     useEffect(()=>{
         if(selectedclient) setForm(selectedclient);
     },[selectedclient]);
 
     const hc = (e)=>{
+        if(e.target.name === 'image'){
+             setForm({...form, image:e.target.files[0]});
+        } else {
      setForm({...form,[e.target.name]:e.target.value});
+        }
     };
     const hs= async(e)=>{
      e.preventDefault();
@@ -18,7 +22,7 @@ const Clientform = ({fetchclient,selectedclient,setSelectedclient}) => {
      } else {
          await axios.post('http://localhost:5700/api/clients',form);
      }
-     setForm({name:"",sector:"",location:"",status:""});
+     setForm({name:"",sector:"",location:"",status:"",image:null});
      fetchclient();
     };
 
@@ -68,6 +72,15 @@ const Clientform = ({fetchclient,selectedclient,setSelectedclient}) => {
         onChange={hc}
         className='form-control col-md-3'
         value={form.status}
+    />
+   </div>
+   <br></br>
+   <div className='form-group'>
+    <label>Image:</label>
+    <input 
+        type='file'
+        name='image'
+        onChange={hc}
     />
    </div>
  <button type='submit'>{selectedclient ? "Update":"Add"} Client</button>

@@ -14,7 +14,9 @@ const Clientlist = ({clients,fetchclients,setSeletedclient}) => {
      <th>sector</th>
       <th>location</th>
        <th>status</th>
+        <th>Image</th>
        <th>Action</th>
+      
   </tr>
   {
     clients.map(x=>(
@@ -23,6 +25,9 @@ const Clientlist = ({clients,fetchclients,setSeletedclient}) => {
         <td>{x.sector}</td>
         <td>{x.location}</td>
         <td>{x.status}</td>
+        <td>
+          <img src={`http://localhost:5700/uploads/${x.image}`}/>
+        </td>
         <td>
             <button className='btn btn-dark' onClick={()=>setSeletedclient(x)}>Edit</button>
              <button className='btn btn-danger' onClick={()=>deleteclient(x._id)}>Delete</button>

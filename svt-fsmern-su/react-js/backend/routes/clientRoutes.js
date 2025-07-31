@@ -1,12 +1,35 @@
 const express = require("express");
 const router = express.Router();
 const Client = require("../models/Client");
+const multer = require("multer");
+const path = require("path");
+
+
+//multer setup
+const storage = multer.diskStorage({
+    destination:(req,file,cb) => {
+        cb(null,'uploads/');
+    },
+      filename:(req,file,cb) => {
+        const uniqename = Date.now() + path.extname(file.originalname);
+        cb(null,uniqename);
+    },
+
+});
+const upload = multer({storage});
+
+
+
+
+
 
 //insert
 
-router.post("/", async(req,res)=>{
+router.post("/", upload.single('image'),async(req,res)=>{
     try {
-        const client = new Client(req.body);
+        const {name,sector,location,status} = req.body;
+        const image = req.file ? req.file.filename: null;
+        const client = new Client({name,sector,location,status,image});
         await client.save();
         res.status(201).json(client);
     }
@@ -24,6 +47,22 @@ router.get("/", async(req,res)=>{
         res.status(400).json({error:err.message});
     }
 });
+//SEARCH-NAME WISE
+router.get('/search',async(req,res)=>{
+    try {
+        const {name } = req.query;
+        if(!name) {
+            return res.status(400).json({message:'name is requires'});
+        }
+        const clients = await  Client.find({
+            name:{$regex: `^${name}`,$options:'i'}
+        });
+        res.status(200).json(clients);
+
+    } catch(error) {
+        res.status(400).json({message:error.message});
+    }
+})
 //single view
 router.get("/:id", async(req,res)=>{
     try {
@@ -36,9 +75,13 @@ router.get("/:id", async(req,res)=>{
     }
 });
 //update
-router.put("/:id", async(req,res)=>{
+router.put("/:id",upload.single("image"), async(req,res)=>{
     try {
-        const client = await Client.findByIdAndUpdate(req.params.id,req.body,{new:true});
+         const {name,sector,location,status} = req.body;
+        const image = req.file ? req.file.filename: null;
+        const updatedata = {name,sector,location,status};
+        if(image) updatedata.image = image;
+        const client = await Client.findByIdAndUpdate(req.params.id,updatedata,{new:true});
         if(!client) return res.status(400).json({message:"client not found"});
         res.status(200).json(client);
     }
