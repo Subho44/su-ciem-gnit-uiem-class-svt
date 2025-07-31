@@ -1,44 +1,61 @@
-import React from 'react'
-import axios from 'axios'
+import React from 'react';
+import axios from 'axios';
 
-const Clientlist = ({clients,fetchclients,setSeletedclient}) => {
- const deleteclient = async(id)=> {
-  await axios.delete(`http://localhost:5700/api/clients/${id}`);
-  fetchclients();
- }
+const Clientlist = ({ clients, fetchclients, setSeletedclient }) => {
 
-  return <>
-  <table className='table table-dark'>
-  <tr>
-    <th>name</th>
-     <th>sector</th>
-      <th>location</th>
-       <th>status</th>
-        <th>Image</th>
-       <th>Action</th>
-      
-  </tr>
-  {
-    clients.map(x=>(
-        <tr>
-        <td>{x.name}</td>
-        <td>{x.sector}</td>
-        <td>{x.location}</td>
-        <td>{x.status}</td>
-        <td>
-          <img src={`http://localhost:5700/uploads/${x.image}`}/>
-        </td>
-        <td>
-            <button className='btn btn-dark' onClick={()=>setSeletedclient(x)}>Edit</button>
-             <button className='btn btn-danger' onClick={()=>deleteclient(x._id)}>Delete</button>
-        </td>
-        </tr>
-    ))
-  }
+  const deleteclient = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5700/api/clients/${id}`);
+      fetchclients();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
 
-  </table>
+  return (
+    <>
+      <table className='table table-dark'>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Sector</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Image</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {clients.map((x) => (
+            <tr key={x._id}>
+              <td>{x.name}</td>
+              <td>{x.sector}</td>
+              <td>{x.location}</td>
+              <td>{x.status}</td>
+              <td>
+                {
+                  x.image ? (
+                    <img
+                      src={`http://localhost:5700/uploads/${x.image}`}
+                      alt={x.name}
+                      width="80"
+                      height="80"
+                    />
+                  ) : (
+                    <span>No Image</span>
+                  )
+                }
+              </td>
+              <td>
+                <button className='btn btn-dark me-2' onClick={() => setSeletedclient(x)}>Edit</button>
+                <button className='btn btn-danger' onClick={() => deleteclient(x._id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+};
 
-  </>
-}
-
-export default Clientlist
+export default Clientlist;
